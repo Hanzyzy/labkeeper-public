@@ -1,0 +1,3 @@
+LabKeeper — pinjam alat lab cukup scan QR, pantau real-time, kembalikan tepat waktu. 🎥
+Project sekolah (Flask + SQLite), open source: github.com/Hanzyzy/labkeeper-public
+Scan QR di akhir video untuk buka repo-nya!

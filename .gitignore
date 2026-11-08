@@ -19,3 +19,9 @@ static/css/*.doubled_*
 static/css/*.final_*
 static/css/*.fixed
 static/css/*.pre_*
+node_modules/
+.hyperframes/
+.waveform-cache/
+brag-output-2026-11-08/composition/assets/voice_old/
+brag-output-2026-11-08/composition/renders/
+tts_tmp.py

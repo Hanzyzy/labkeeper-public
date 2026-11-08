@@ -1,0 +1,16 @@
+pesan ini di tulis dengan tangan saya sendiri -hanif
+
+untuk mendapat kan diagram seperti itu adalah dengan cara mengubah domain GitHub.com menjadi gitdiagram.com pada link repo kalian
+
+contoh:
+
+https://github.com/Hanzyzy/labkeeper-public (contoh link repo kalian)
+
+ubah menjadi:
+
+https://gitdiagram.com/Hanzyzy/labkeeper-public (ubah GitHub.com menjadi gitdiagram.com)
+
+
+
+notes: repo kalian harus public dan repo kalian harus terisi terlebih dahulu dengan project kalian nanti nya ada ai yang membuat diagram untuk project kalian dan kalian bisa atur sesuka hati kalian
+

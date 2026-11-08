@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.15.0/dist/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #F8F9FA;
+        --paper: #FFFFFF;
+        --line: #E5E7EB;
+        --ink: #000000;
+        --ink2: #4B5563;
+        --muted: #9CA3AF;
+        --ok: #059669;
+        --bad: #DC2626;
+        --font-display: "Playfair Display", Georgia, serif;
+        --font-body: "Inter", Arial, sans-serif;
+        --font-mono: "JetBrains Mono", Consolas, monospace;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); font-family: var(--font-body); color: var(--ink); }
+      #root { position: relative; width: 1920px; height: 1080px; }
+      .clip { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+
+      .display { font-family: var(--font-display); font-weight: 800; letter-spacing: -0.03em; }
+      .mono { font-family: var(--font-mono); }
+      .eyebrow { font-family: var(--font-mono); font-size: 28px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink2); }
+
+      /* Scene 1 */
+      #s1 .big { font-family: var(--font-display); font-size: 120px; font-weight: 800; text-align: center; line-height: 1.1; }
+      #s1 .sub { font-size: 34px; color: var(--ink2); margin-top: 28px; text-align: center; }
+      #s1 .stamp {
+        position: absolute; top: 220px; left: 640px;
+        font-family: var(--font-mono); font-weight: 700; font-size: 44px; letter-spacing: 0.1em;
+        color: var(--bad); border: 6px solid var(--bad); padding: 14px 36px; border-radius: 10px;
+        transform: rotate(-8deg); background: rgba(255,255,255,0.85);
+      }
+
+      /* Scene 2 */
+      #s2 { flex-direction: column; gap: 36px; }
+      #s2 img { width: 200px; height: 200px; object-fit: contain; }
+      #s2 .wordmark { font-family: var(--font-display); font-size: 150px; font-weight: 800; letter-spacing: -0.03em; }
+      #s2 .tagline { font-size: 38px; color: var(--ink2); }
+
+      /* Scene 3 */
+      .phone {
+        width: 560px; height: 840px; background: var(--paper); border: 4px solid var(--ink); border-radius: 48px;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.12); padding: 56px 40px; display: flex; flex-direction: column; gap: 28px; position: relative; overflow: hidden;
+      }
+      .scanbox {
+        width: 100%; height: 360px; border: 3px dashed var(--ink2); border-radius: 24px;
+        display: flex; align-items: center; justify-content: center; position: relative; background: #1a1a1a;
+      }
+      .scanbox img { width: 250px; height: 250px; }
+      .scanline { position: absolute; left: 20px; right: 20px; height: 4px; background: var(--ok); box-shadow: 0 0 24px var(--ok); top: 30px; }
+      .borrowcard { background: var(--bg); border: 2px solid var(--line); border-radius: 20px; padding: 30px 34px; display: flex; flex-direction: column; gap: 14px; }
+      .borrowcard .code { font-family: var(--font-mono); font-weight: 700; font-size: 42px; }
+      .borrowcard .row { display: flex; justify-content: space-between; font-size: 28px; color: var(--ink2); }
+      .borrowcard .timer { font-family: var(--font-mono); font-weight: 700; font-size: 64px; color: var(--ink); }
+      .badge { display: inline-block; font-family: var(--font-mono); font-size: 28px; font-weight: 700; letter-spacing: 0.08em; padding: 6px 16px; border-radius: 999px; }
+      .badge.active { background: var(--ink); color: #fff; }
+      .badge.ok { background: var(--ok); color: #fff; }
+      .badge.bad { background: var(--bad); color: #fff; }
+      #s3 .caption { position: absolute; left: 140px; top: 180px; width: 520px; }
+      #s3 .caption h3 { font-family: var(--font-display); font-size: 64px; font-weight: 800; line-height: 1.15; margin-bottom: 20px; }
+      #s3 .caption p { font-size: 30px; color: var(--ink2); line-height: 1.5; }
+
+      /* Scene 4 */
+      .bento { display: grid; grid-template-columns: 520px 520px; gap: 40px; }
+      .stat {
+        width: 520px; height: 280px; background: var(--paper); border: 2px solid var(--line); border-radius: 28px;
+        padding: 44px 48px; display: flex; flex-direction: column; justify-content: space-between;
+        box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+      }
+      .stat .label { font-family: var(--font-mono); font-size: 28px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink2); }
+      .stat .value { font-family: var(--font-display); font-size: 110px; font-weight: 800; line-height: 1; }
+      .stat.v-ok .value { color: var(--ok); }
+      .stat.v-bad .value { color: var(--bad); }
+      #s4 .caption { position: absolute; top: 90px; left: 0; right: 0; text-align: center; }
+      #s4 .caption h3 { font-family: var(--font-display); font-size: 72px; font-weight: 800; }
+
+      /* Scene 5 */
+      .steps { display: flex; gap: 60px; align-items: center; }
+      .stepcard {
+        width: 640px; background: var(--paper); border: 2px solid var(--line); border-radius: 28px; padding: 56px;
+        display: flex; flex-direction: column; gap: 24px; box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+      }
+      .stepcard .num { font-family: var(--font-mono); font-weight: 700; font-size: 28px; color: var(--muted); letter-spacing: 0.12em; }
+      .stepcard h4 { font-family: var(--font-display); font-size: 54px; font-weight: 800; }
+      .check { width: 96px; height: 96px; border-radius: 50%; background: var(--ok); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 56px; }
+      .arrow { font-size: 90px; color: var(--muted); font-family: var(--font-display); }
+
+      /* Scene 6 */
+      .chips { display: flex; flex-direction: column; gap: 36px; }
+      .chip {
+        background: var(--paper); border: 2px solid var(--ink); border-radius: 999px; padding: 28px 64px;
+        font-size: 44px; font-weight: 700; display: flex; align-items: center; gap: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+      }
+      .chip .dot { width: 20px; height: 20px; border-radius: 50%; background: var(--ink); }
+      .chip em { font-style: normal; color: var(--ink2); font-weight: 500; font-size: 34px; }
+      #s6 .caption { position: absolute; top: 110px; left: 0; right: 0; text-align: center; }
+      #s6 .caption h3 { font-family: var(--font-display); font-size: 72px; font-weight: 800; }
+
+      /* Scene 7 */
+      #s7 { flex-direction: column; gap: 40px; }
+      #s7 h3 { font-family: var(--font-display); font-size: 130px; font-weight: 800; }
+      #s7 .url { font-family: var(--font-mono); font-weight: 700; font-size: 40px; background: var(--ink); color: #fff; padding: 20px 44px; border-radius: 16px; }
+
+      /* Scene 8 */
+      .qrcard {
+        background: var(--paper); border: 2px solid var(--ink); border-radius: 36px; padding: 70px 90px;
+        display: flex; flex-direction: column; align-items: center; gap: 36px; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+      }
+      .qrcard img { width: 440px; height: 440px; }
+      .qrcard .scan { font-family: var(--font-mono); font-weight: 700; font-size: 34px; letter-spacing: 0.06em; }
+      .qrcard .tag { font-family: var(--font-display); font-size: 56px; font-weight: 800; }
+      .qrcard .tag span { color: var(--ok); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="67" data-width="1920" data-height="1080">
+
+      <!-- Scene 1 : 0-7 hook -->
+      <div id="s1" class="clip" data-start="0" data-duration="7" data-track-index="0">
+        <div>
+          <div class="eyebrow">Laboratorium Sekolah</div>
+          <div class="big">Alat lab hilang…?</div>
+          <div class="sub">Tidak ada catatan siapa yang terakhir memakainya.</div>
+        </div>
+        <div class="stamp">TIDAK ADA CATATAN</div>
+      </div>
+
+      <!-- Scene 2 : 7-16 reveal -->
+      <div id="s2" class="clip" data-start="7" data-duration="9" data-track-index="0">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:36px;">
+          <img src="assets/img/logo.png" alt="Logo LabKeeper" />
+          <div class="wordmark">LabKeeper</div>
+          <div class="tagline">Sistem peminjaman alat laboratorium berbasis QR Code</div>
+        </div>
+      </div>
+
+      <!-- Scene 3 : 16-26.5 alur siswa -->
+      <div id="s3" class="clip" data-start="16" data-duration="10.5" data-track-index="0">
+        <div class="caption">
+          <div class="eyebrow" style="margin-bottom:18px;">Portal Siswa</div>
+          <h3>Scan QR.<br />Alat langsung tercatat.</h3>
+          <p>Hitung mundur waktu pengembalian berjalan otomatis, real-time.</p>
+        </div>
+        <div class="phone">
+          <div class="scanbox">
+            <img src="assets/img/qr_tool.png" alt="QR alat" />
+            <div class="scanline"></div>
+          </div>
+          <div class="borrowcard">
+            <div class="code">MTR-001</div>
+            <div class="row"><span>Multimeter Digital</span><span class="badge active">AKTIF</span></div>
+            <div class="row"><span>Batas kembali</span><span id="timer">03:00:00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 4 : 26.5-36.5 dashboard -->
+      <div id="s4" class="clip" data-start="26.5" data-duration="10" data-track-index="0">
+        <div class="caption"><div class="eyebrow" style="margin-bottom:14px;">Portal Laboran · Live</div><h3>Dashboard Monitoring</h3></div>
+        <div class="bento" style="margin-top:210px;">
+          <div class="stat"><div class="label">Total Alat</div><div class="value">42</div></div>
+          <div class="stat v-ok"><div class="label">Tersedia</div><div class="value">28</div></div>
+          <div class="stat"><div class="label">Dipinjam</div><div class="value">12</div></div>
+          <div class="stat v-bad"><div class="label">Telat</div><div class="value">2</div></div>
+        </div>
+      </div>
+
+      <!-- Scene 5 : 36.5-44 verifikasi -->
+      <div id="s5" class="clip" data-start="36.5" data-duration="7.5" data-track-index="0">
+        <div class="steps">
+          <div class="stepcard">
+            <div class="num">LANGKAH 1</div>
+            <h4>Konfirmasi Siswa</h4>
+            <div class="check" id="check1">✓</div>
+          </div>
+          <div class="arrow">→</div>
+          <div class="stepcard">
+            <div class="num">LANGKAH 2</div>
+            <h4>Verifikasi Admin</h4>
+            <div class="check" id="check2">✓</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scene 6 : 44-51.5 stack -->
+      <div id="s6" class="clip" data-start="44" data-duration="7.5" data-track-index="0">
+        <div class="caption"><h3>Dibangun dengan</h3></div>
+        <div class="chips" style="margin-top:230px;">
+          <div class="chip"><span class="dot"></span>Flask 3.0 <em>· Python 3.11</em></div>
+          <div class="chip"><span class="dot"></span>SQLite <em>· tanpa server DB</em></div>
+          <div class="chip"><span class="dot"></span>QR Code <em>· scan dari kamera HP</em></div>
+          <div class="chip"><span class="dot"></span>Multi-Sekolah <em>· data terisolasi 100%</em></div>
+        </div>
+      </div>
+
+      <!-- Scene 7 : 51.5-56.5 open source -->
+      <div id="s7" class="clip" data-start="51.5" data-duration="5" data-track-index="0">
+        <div>
+          <div class="eyebrow" style="text-align:center;margin-bottom:30px;">Kode Sumber Terbuka</div>
+          <h3 style="text-align:center;">Open Source</h3>
+          <div style="text-align:center;margin-top:44px;"><span class="url">github.com/Hanzyzy/labkeeper-public</span></div>
+        </div>
+      </div>
+
+      <!-- Scene 8 : 56.5-67 outro QR -->
+      <div id="s8" class="clip" data-start="56.5" data-duration="10.5" data-track-index="0">
+        <div class="qrcard">
+          <img src="assets/img/qr_repo.png" alt="QR repositori GitHub LabKeeper" />
+          <div class="scan">SCAN UNTUK BUKA REPO</div>
+          <div class="tag">Pinjam. Pantau. <span>Kembalikan.</span></div>
+        </div>
+      </div>
+
+      <!-- Audio: music -->
+      <audio id="music" data-start="0" data-duration="67" data-track-index="1" data-volume="0.18" src="assets/music/music.mp3"></audio>
+      <!-- Audio: voiceover per scene -->
+      <audio id="vo-s1" data-start="0.8" data-duration="6.27" data-track-index="3" data-volume="1" src="assets/voice/s1.mp3"></audio>
+      <audio id="vo-s2" data-start="7.8" data-duration="6.5" data-track-index="4" data-volume="1" src="assets/voice/s2.mp3"></audio>
+      <audio id="vo-s3" data-start="16.8" data-duration="8.41" data-track-index="5" data-volume="1" src="assets/voice/s3.mp3"></audio>
+      <audio id="vo-s4" data-start="27.3" data-duration="9.38" data-track-index="6" data-volume="1" src="assets/voice/s4.mp3"></audio>
+      <audio id="vo-s5" data-start="37.3" data-duration="6.69" data-track-index="7" data-volume="1" src="assets/voice/s5.mp3"></audio>
+      <audio id="vo-s6" data-start="44.8" data-duration="6.92" data-track-index="8" data-volume="1" src="assets/voice/s6.mp3"></audio>
+      <audio id="vo-s7" data-start="52.3" data-duration="2.51" data-track-index="9" data-volume="1" src="assets/voice/s7.mp3"></audio>
+      <audio id="vo-s8" data-start="57.8" data-duration="5.99" data-track-index="10" data-volume="1" src="assets/voice/s8.mp3"></audio>
+      <!-- Audio: SFX -->
+      <audio id="sfx-1" data-start="1.2" data-duration="0.14" data-track-index="12" data-volume="0.5" src="assets/sfx/impactGeneric_light_000.ogg"></audio>
+      <audio id="sfx-switch" data-start="17.6" data-duration="0.62" data-track-index="13" data-volume="0.5" src="assets/sfx/switch_001.ogg"></audio>
+      <audio id="sfx-click" data-start="28.0" data-duration="0.09" data-track-index="14" data-volume="0.45" src="assets/sfx/click1.ogg"></audio>
+      <audio id="sfx-2" data-start="30.2" data-duration="0.09" data-track-index="15" data-volume="0.45" src="assets/sfx/click1.ogg"></audio>
+      <audio id="sfx-3" data-start="32.4" data-duration="0.09" data-track-index="16" data-volume="0.45" src="assets/sfx/click1.ogg"></audio>
+      <audio id="sfx-4" data-start="34.6" data-duration="0.09" data-track-index="17" data-volume="0.45" src="assets/sfx/click1.ogg"></audio>
+      <audio id="sfx-check" data-start="38.2" data-duration="0.23" data-track-index="18" data-volume="0.5" src="assets/sfx/rollover1.ogg"></audio>
+      <audio id="sfx-5" data-start="40.4" data-duration="0.23" data-track-index="19" data-volume="0.5" src="assets/sfx/rollover1.ogg"></audio>
+      <audio id="sfx-6" data-start="57.0" data-duration="0.62" data-track-index="20" data-volume="0.6" src="assets/sfx/switch_001.ogg"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const EASE = "power3.out";
+
+      // S1 hook (0-7) — elemen utama visible sejak frame 0 (thumbnail), masuk via slide-up
+      tl.from("#s1 .eyebrow", {y:30, duration:0.5, ease:EASE}, 0.2);
+      tl.from("#s1 .big", {y:60, duration:0.7, ease:EASE}, 0.4);
+      tl.from("#s1 .sub", {y:40, duration:0.6, ease:EASE}, 4.2);
+      tl.fromTo("#s1 .stamp", {opacity:0, scale:2.4, rotate:-25}, {opacity:1, scale:1, rotate:-8, duration:0.35, ease:"power4.in"}, 2.2); // beat-locked: stamp at 2.2s
+      tl.to("#s1 .stamp", {scale:1.02, duration:1.2, ease:"sine.inOut", yoyo:true, repeat:2}, 3.2);
+
+      // S2 reveal (7-16)
+      tl.fromTo("#s2 img", {opacity:0, y:80, scale:0.8}, {opacity:1, y:0, scale:1, duration:0.8, ease:EASE}, 7.5);
+      tl.fromTo("#s2 .wordmark", {opacity:0, y:50}, {opacity:1, y:0, duration:0.8, ease:EASE}, 8.1);
+      tl.fromTo("#s2 .tagline", {opacity:0, y:30}, {opacity:1, y:0, duration:0.7, ease:EASE}, 9.0);
+      tl.to("#s2 img", {scale:1.04, duration:6, ease:"sine.inOut"}, 10);
+
+      // S3 alur siswa (16-26.5)
+      tl.fromTo("#s3 .caption", {opacity:0, x:-80}, {opacity:1, x:0, duration:0.7, ease:EASE}, 16.3);
+      tl.fromTo("#s3 .phone", {opacity:0, y:90, rotate:2}, {opacity:1, y:0, rotate:0, duration:0.8, ease:EASE}, 16.6);
+      tl.fromTo("#s3 .scanline", {y:0}, {y:290, duration:1.2, ease:"sine.inOut", repeat:4, yoyo:true}, 17.6);
+      tl.fromTo("#s3 .borrowcard", {opacity:0, x:60}, {opacity:1, x:0, duration:0.6, ease:EASE}, 21.0);
+      // countdown deterministik 03:00:00 -> 02:59:41 (ponytail: simulasi angka via GSAP, bukan jam nyata)
+      const cd = {s: 10800};
+      const fmt = v => {
+        const h = Math.floor(v/3600), m = Math.floor((v%3600)/60), s = Math.floor(v%60);
+        return [h,m,s].map(n => String(n).padStart(2,"0")).join(":");
+      };
+      tl.to(cd, {s: 10781, duration: 4.5, ease:"none",
+        onUpdate: () => { document.getElementById("timer").textContent = fmt(cd.s); }}, 21.2);
+
+      // S4 dashboard (26.5-36.5)
+      tl.fromTo("#s4 .caption", {opacity:0, y:40}, {opacity:1, y:0, duration:0.6, ease:EASE}, 26.8);
+      // beat-grid: stat cards at 28.0 / 30.2 / 32.4 / 34.6 (SFX klik di timestamp sama)
+      tl.fromTo("#s4 .stat", {opacity:0, y:60}, {opacity:1, y:0, duration:0.55, ease:EASE, stagger:2.2}, 28.0);
+
+      // S5 verifikasi (36.5-44)
+      tl.fromTo("#s5 .stepcard", {opacity:0, y:60}, {opacity:1, y:0, duration:0.6, ease:EASE, stagger:0.5}, 37.0);
+      tl.fromTo("#s5 .arrow", {opacity:0, scale:0.6}, {opacity:1, scale:1, duration:0.4, ease:"back.out(2)"}, 38.0);
+      tl.fromTo("#s5 #check1", {opacity:0, scale:0}, {opacity:1, scale:1, duration:0.4, ease:"back.out(2.5)"}, 38.2);
+      tl.fromTo("#s5 #check2", {opacity:0, scale:0}, {opacity:1, scale:1, duration:0.4, ease:"back.out(2.5)"}, 40.4);
+
+      // S6 stack (44-51.5)
+      tl.fromTo("#s6 .caption", {opacity:0, y:40}, {opacity:1, y:0, duration:0.6, ease:EASE}, 44.3);
+      tl.fromTo("#s6 .chip", {opacity:0, x:-80}, {opacity:1, x:0, duration:0.55, ease:EASE, stagger:1.1}, 45.2);
+
+      // S7 open source (51.5-56.5)
+      tl.fromTo("#s7 h3", {opacity:0, y:60}, {opacity:1, y:0, duration:0.7, ease:EASE}, 51.8);
+      tl.fromTo("#s7 .eyebrow", {opacity:0}, {opacity:1, duration:0.5, ease:EASE}, 51.6);
+      tl.fromTo("#s7 .url", {opacity:0, y:30}, {opacity:1, y:0, duration:0.6, ease:EASE}, 53.0);
+
+      // S8 outro QR (56.5-67)
+      tl.fromTo("#s8 .qrcard", {opacity:0, scale:0.85, y:60}, {opacity:1, scale:1, y:0, duration:0.8, ease:EASE}, 56.8);
+      tl.fromTo("#s8 .scan", {opacity:0}, {opacity:1, duration:0.5, ease:EASE}, 58.4);
+      tl.fromTo("#s8 .tag", {opacity:0, y:24}, {opacity:1, y:0, duration:0.6, ease:EASE}, 59.2);
+      tl.fromTo("#s8 img", {scale:1}, {scale:1.05, duration:6, ease:"sine.inOut"}, 60);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
