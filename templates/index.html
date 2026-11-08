@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}LabKeeper — Portal Akses Multi-Sekolah{% endblock %}
+
+{% block content %}
+<!-- Hide main navbar & standard footer on initial gateway landing page -->
+<style>
+  #mainNav { display: none !important; }
+  .footer-editorial { display: none !important; }
+  body { background: var(--bg); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
+</style>
+
+<div class="page-container" style="max-width:920px;margin:0 auto;padding-top:2rem;padding-bottom:3rem;display:flex;flex-direction:column;justify-content:center;min-height:88vh;">
+
+  <!-- Brand Header -->
+  <div class="reveal" style="text-align:center;margin-bottom:3rem;">
+    <div style="display:inline-flex;align-items:center;gap:0.625rem;background:var(--paper);border:1px solid var(--line);padding:8px 18px;border-radius:999px;margin-bottom:1.25rem;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="LabKeeper" style="height:20px;width:auto;">
+      <span style="font-family:var(--font-mono);font-size:0.75rem;font-weight:700;letter-spacing:0.06em;color:var(--ink);">LABKEEPER DIGITAL</span>
+    </div>
+
+    <h1 style="font-family:var(--font-display);font-weight:800;font-size:clamp(2rem,5vw,3.25rem);line-height:1.15;margin-bottom:0.875rem;color:var(--ink);letter-spacing:-0.03em;">
+      Sistem Peminjaman <br/><span class="highlight">Alat Laboratorium</span>
+    </h1>
+
+    <p style="color:var(--ink-2);max-width:540px;margin:0 auto;font-size:1rem;line-height:1.6;">
+      Platform peminjaman alat lab sekolah berbasis QR Code. Silakan pilih portal akses kamu di bawah ini untuk melanjutkan.
+    </p>
+  </div>
+
+  <!-- Dual Entry Gateway (Hanya 2 Opsi Utama: Murid atau Sekolah) -->
+  <div class="reveal reveal-delay-1" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));gap:2rem;width:100%;">
+    
+    <!-- Option 1: Portal Murid -->
+    <div class="bezel-card" style="border:1px solid var(--line);border-radius:1.5rem;box-shadow:0 8px 30px rgba(0,0,0,0.04);transition:all 0.3s ease;">
+      <div class="bezel-card-inner" style="padding:2.25rem 2rem;display:flex;flex-direction:column;align-items:flex-start;height:100%;">
+        
+        <div style="width:56px;height:56px;border-radius:16px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+        </div>
+        
+        <span class="eyebrow-tag" style="font-size:0.6875rem;letter-spacing:0.12em;">AKSES SISWA</span>
+        
+        <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.5rem;margin:0.25rem 0 0.75rem;color:var(--ink);">
+          Portal Murid / Siswa
+        </h2>
+        
+        <p style="font-size:0.9375rem;color:var(--ink-2);line-height:1.6;margin-bottom:2rem;flex:1;">
+          Masuk menggunakan NIS & asal sekolah kamu untuk melakukan peminjaman alat, mengecek status pinjaman, dan mengembalikan alat lab.
+        </p>
+
+        {% if current_student %}
+          <a href="/student/dashboard" class="btn btn-primary w-full" style="justify-content:center;font-weight:700;padding:14px 24px;font-size:0.9375rem;">
+            Buka Dashboard Siswa &nbsp;→
+          </a>
+        {% else %}
+          <a href="/student/login" class="btn btn-primary w-full" style="justify-content:center;font-weight:700;padding:14px 24px;font-size:0.9375rem;">
+            Masuk sebagai Murid &nbsp;→
+          </a>
+        {% endif %}
+
+      </div>
+    </div>
+
+    <!-- Option 2: Portal Sekolah / Admin -->
+    <div class="bezel-card" style="border:1px solid var(--line);border-radius:1.5rem;box-shadow:0 8px 30px rgba(0,0,0,0.04);transition:all 0.3s ease;">
+      <div class="bezel-card-inner" style="padding:2.25rem 2rem;display:flex;flex-direction:column;align-items:flex-start;height:100%;">
+        
+        <div style="width:56px;height:56px;border-radius:16px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+        </div>
+        
+        <span class="eyebrow-tag" style="font-size:0.6875rem;letter-spacing:0.12em;">AKSES PENGELOLA</span>
+        
+        <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.5rem;margin:0.25rem 0 0.75rem;color:var(--ink);">
+          Portal Sekolah / Admin
+        </h2>
+        
+        <p style="font-size:0.9375rem;color:var(--ink-2);line-height:1.6;margin-bottom:2rem;flex:1;">
+          Masuk sebagai pengelola lab sekolah untuk mendaftarkan siswa, mengelola inventaris alat lab, cetak QR label, dan unduh laporan Excel.
+        </p>
+
+        {% if current_admin %}
+          <a href="/admin/dashboard" class="btn btn-secondary w-full" style="justify-content:center;font-weight:700;padding:14px 24px;font-size:0.9375rem;">
+            Buka Panel Admin Sekolah &nbsp;→
+          </a>
+        {% else %}
+          <a href="/admin/login" class="btn btn-secondary w-full" style="justify-content:center;font-weight:700;padding:14px 24px;font-size:0.9375rem;">
+            Masuk Portal Sekolah &nbsp;→
+          </a>
+        {% endif %}
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Minimal Footer Tag -->
+  <div class="reveal reveal-delay-2" style="text-align:center;margin-top:3rem;">
+    <span style="font-size:0.75rem;color:var(--muted);font-family:var(--font-mono);">
+      LabKeeper Multi-School Gateway
+    </span>
+  </div>
+
+</div>
+{% endblock %}

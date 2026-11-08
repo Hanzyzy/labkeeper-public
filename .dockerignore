@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+.commandcode
+venv
+.venv
+__pycache__
+*.pyc
+*.db
+instance
+static/uploads
+PASSWORD_AKUN_LABKEEPER.md

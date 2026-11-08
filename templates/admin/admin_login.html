@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}Portal Login Sekolah — LabKeeper{% endblock %}
+{% block content %}
+<!-- Strictly hide navbar on admin login form page -->
+<style>#mainNav { display: none !important; }</style>
+
+<div class="page-container" style="padding-top:40px;padding-bottom:40px;display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 120px);">
+
+  <div class="bezel-card reveal" style="width:100%;max-width:440px;border:1px solid var(--line);border-radius:1.5rem;box-shadow:0 12px 40px rgba(0,0,0,0.05);">
+    <div class="bezel-card-inner" style="padding:2.25rem 2rem;">
+      <a href="/" class="login-back" style="margin-bottom:1.5rem;display:inline-flex;align-items:center;gap:6px;font-size:0.875rem;color:var(--ink-2);text-decoration:none;font-weight:500;">
+        ← Kembali ke Pilihan Portal
+      </a>
+
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01"></path><path d="M16 6h.01"></path><path d="M12 6h.01"></path><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path></svg>
+        </div>
+        <div>
+          <span class="eyebrow-tag" style="font-size:0.625rem;letter-spacing:0.1em;margin-bottom:2px;">AKSES PENGELOLA</span>
+          <h1 style="font-family:var(--font-display);font-weight:800;font-size:1.375rem;margin:0;color:var(--ink);">Portal Sekolah / Admin</h1>
+        </div>
+      </div>
+
+      <p class="login-subheading" style="margin-bottom:1.75rem;font-size:0.875rem;color:var(--ink-2);line-height:1.5;">
+        Silakan pilih asal sekolah dan masukkan username admin serta password kamu.
+      </p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}" style="margin-bottom:1.25rem;">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="/admin/login" class="login-form">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="hidden" name="next" value="{{ next_url }}">
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label class="form-label">Asal Sekolah *</label>
+          <select name="school_id" class="form-input" required autofocus>
+            <option value="">— Pilih Asal Sekolah —</option>
+            {% for sch in schools %}
+              <option value="{{ sch.id }}">{{ sch.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.25rem;">
+          <label class="form-label">Username Admin *</label>
+          <input type="text" name="username" class="form-input" placeholder="Masukkan username admin" required>
+        </div>
+
+        <div class="form-group" style="margin-bottom:1.75rem;">
+          <label class="form-label">Password *</label>
+          <input type="password" name="password" class="form-input" placeholder="Masukkan password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-full" style="justify-content:center;font-weight:700;padding:12px 20px;font-size:0.9375rem;border-radius:12px;background:#000000;color:#ffffff;">
+          Masuk Panel Sekolah &nbsp;→
+        </button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

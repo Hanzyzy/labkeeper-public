@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  labkeeper:
+    build: .
+    container_name: labkeeper_app
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./instance:/app/instance
+      - ./static/uploads:/app/static/uploads
+      - ./static/qr_codes:/app/static/qr_codes
+    env_file:
+      - .env
+    environment:
+      - PORT=5000

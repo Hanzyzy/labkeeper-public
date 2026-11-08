@@ -1,0 +1,190 @@
+{% extends "admin_base.html" %}
+{% block title %}Dashboard — Admin LabKeeper{% endblock %}
+{% block content %}
+
+<div class="dashboard-container reveal">
+
+  <header class="page-header" style="margin-bottom:2rem;">
+    <span class="eyebrow-tag">Dashboard</span>
+    <h1 class="page-title">Selamat Datang, <span class="highlight">Admin</span></h1>
+    <p class="page-subtitle">Ringkasan aktivitas LabKeeper hari ini.</p>
+  </header>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid reveal reveal-delay-1">
+    <div class="stat-card">
+      <div class="stat-number">{{ total_alat }}</div>
+      <div class="stat-label">Total Alat</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ tersedia }}</div>
+      <div class="stat-label">Tersedia</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ dipinjam }}</div>
+      <div class="stat-label">Dipinjam</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number">{{ telat }}</div>
+      <div class="stat-label">Telat</div>
+    </div>
+  </div>
+
+  <!-- Pending Approvals -->
+  {% if pending_borrows or pending_returns %}
+  <div class="section-card reveal reveal-delay-1" style="margin-bottom:24px;">
+    <div class="section-header-bar">
+      <h2 class="section-title">Menunggu Persetujuan <span style="color:var(--muted);font-weight:500;font-size:14px;">({{ pending_borrows|length }} pinjam &middot; {{ pending_returns|length }} kembali)</span></h2>
+      <a href="/admin/borrowings?status_filter=pending" class="section-action">Lihat Semua →</a>
+    </div>
+    <div class="activity-list">
+      {% for b in pending_borrows %}
+      <div class="activity-item">
+        <div class="activity-avatar">{{ b.student_initial }}</div>
+        <div class="activity-info">
+          <div class="activity-text"><strong>{{ b.student_name }}</strong> mengajukan pinjam <strong>{{ b.tool_name }}</strong></div>
+          <div class="activity-time">{{ b.borrow_date.strftime('%d/%m/%Y %H:%M') }} WIB</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <form method="POST" action="/admin/approve-borrow/{{ b.id }}" style="display:inline;" onsubmit='event.preventDefault(); const f = this; customConfirm({{ ("Setujui peminjaman " ~ b.tool_name ~ " oleh " ~ b.student_name ~ "?")|tojson }}, "Setujui Peminjaman").then(ok => { if(ok) f.submit(); });'>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary btn-sm">Setujui</button>
+          </form>
+          <button type="button" class="btn btn-danger btn-sm" onclick='showRejectModal({{ b.id }}, "borrow", {{ b.tool_name|tojson }})'>Tolak</button>
+        </div>
+      </div>
+      {% endfor %}
+      {% for b in pending_returns %}
+      <div class="activity-item">
+        <div class="activity-avatar">{{ b.student_initial }}</div>
+        <div class="activity-info">
+          <div class="activity-text"><strong>{{ b.student_name }}</strong> mengajukan pengembalian <strong>{{ b.tool_name }}</strong></div>
+          <div class="activity-time">{{ b.return_requested_at.strftime('%d/%m/%Y %H:%M') if b.return_requested_at else '' }} WIB</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;">
+          <form method="POST" action="/admin/approve-return/{{ b.id }}" style="display:inline;" onsubmit='event.preventDefault(); const f = this; customConfirm({{ ("Izinkan " ~ b.student_name ~ " mengembalikan " ~ b.tool_name ~ "?")|tojson }}, "Setujui Pengembalian").then(ok => { if(ok) f.submit(); });'>
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary btn-sm">Setujui</button>
+          </form>
+          <button type="button" class="btn btn-danger btn-sm" onclick='showRejectModal({{ b.id }}, "return", {{ b.tool_name|tojson }})'>Tolak</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Content Grid -->
+  <div class="content-grid">
+
+    <!-- Recent Borrowings -->
+    <div class="section-card reveal reveal-delay-2">
+      <div class="section-header-bar">
+        <h2 class="section-title">Peminjaman Terbaru</h2>
+        <a href="/admin/borrowings" class="section-action">Lihat Semua →</a>
+      </div>
+
+      {% if recent_borrowings %}
+      <div class="activity-list">
+        {% for b in recent_borrowings[:8] %}
+        <div class="activity-item">
+          {% if b.student_avatar_url %}
+            <img src="{{ b.student_avatar_url }}" alt="{{ b.student_name }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid var(--line);">
+          {% else %}
+            <div class="activity-avatar" style="width:36px;height:36px;border-radius:50%;background:#000000;color:#ffffff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.875rem;">
+              {{ b.student_initial }}
+            </div>
+          {% endif %}
+          <div class="activity-info">
+            <div class="activity-text">
+              <strong>{{ b.student_name }}</strong> meminjam <strong>{{ b.tool_name }}</strong>
+            </div>
+            <div class="activity-time">{{ b.start_time.strftime('%d/%m/%Y %H:%M') }}</div>
+          </div>
+          {% if b.return_time %}
+            <span class="activity-status returned">Kembali</span>
+          {% elif b.is_overdue() %}
+            <span class="activity-status overdue">Telat</span>
+          {% else %}
+            <span class="activity-status borrowed">Aktif</span>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div style="padding:3rem 2rem;text-align:center;">
+        <div style="font-size:1.5rem;margin-bottom:0.75rem;">◇</div>
+        <div style="font-size:0.875rem;color:var(--muted);">Belum ada peminjaman.</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-card reveal reveal-delay-3">
+      <div class="section-header-bar">
+        <h2 class="section-title">Aksi Cepat</h2>
+      </div>
+      <div class="quick-actions-grid">
+        <a href="/admin/tools?action=add" class="quick-action-btn">
+          <span class="icon">＋</span> Tambah Alat
+        </a>
+        <a href="/admin/students?action=add" class="quick-action-btn">
+          <span class="icon">○</span> Tambah Siswa
+        </a>
+        <a href="/admin/qr-labels" class="quick-action-btn">
+          <span class="icon">⌗</span> Cetak QR
+        </a>
+        <a href="/admin/borrowings" class="quick-action-btn">
+          <span class="icon">≡</span> Peminjaman
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal-box">
+    <div class="modal-title">Tolak Permintaan</div>
+    <div class="modal-text" id="rejectModalText"></div>
+    <form id="rejectForm" method="POST" action="">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <textarea id="rejectReasonInput" name="reason" class="form-input" rows="3" placeholder="Wajib isi alasan penolakan..." style="width:100%;margin-bottom:16px;"></textarea>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closeRejectModal()">Batal</button>
+        <button type="submit" class="btn btn-danger">Tolak Permintaan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showRejectModal(id, kind, toolName) {
+  document.getElementById('rejectModalText').textContent = 'Tolak "' + toolName + '"? Berikan alasan penolakan untuk disampaikan ke siswa.';
+  const f = document.getElementById('rejectForm');
+  f.action = kind === 'borrow' ? '/admin/reject-borrow/' + id : '/admin/reject-return/' + id;
+  document.getElementById('rejectReasonInput').value = '';
+  document.getElementById('rejectModal').classList.add('active');
+}
+function closeRejectModal() { document.getElementById('rejectModal').classList.remove('active'); }
+
+document.querySelectorAll('.modal-overlay').forEach(function(overlay) {
+  overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.classList.remove('active'); });
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(function(m) { m.classList.remove('active'); });
+});
+
+document.getElementById('rejectForm').addEventListener('submit', function(e) {
+  const reason = document.getElementById('rejectReasonInput').value.trim();
+  if (!reason) {
+    e.preventDefault();
+    customAlert('Alasan penolakan wajib diisi.', 'Alasan Kosong');
+  }
+});
+</script>
+{% endblock %}
