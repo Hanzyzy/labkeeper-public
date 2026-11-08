@@ -1,169 +1,233 @@
-# 🔬 LabKeeper — Sistem Manajemen Peminjaman Alat Lab Sekolah
+<div align="center">
 
-**LabKeeper** adalah platform web manajemen peminjaman alat laboratorium sekolah berbasis QR Code yang mendukung arsitektur **Multi-Sekolah (Multi-Tenant)**. Aplikasi ini dirancang mobile-first, responsif, modern, dan sangat mudah digunakan oleh siswa maupun pengelola lab (laboran/admin).
+<img src="static/images/logo.png" alt="Logo LabKeeper" width="110">
 
----
+# 🔬 LabKeeper
 
-## ✨ Fitur-Fitur Utama
+**Sistem Manajemen Peminjaman Alat Laboratorium Sekolah berbasis QR Code**
 
-### 🏫 1. Multi-Sekolah (Multi-Tenant) Terisolasi
-* **Isolasi Data Per Sekolah**: Setiap sekolah memiliki data alat, siswa, admin, serta riwayat peminjaman yang terisolasi 100%.
-* **Aturan Durasi Peminjaman Independen (`School.loan_duration_hours`)**: Admin Sekolah A dapat menetapkan durasi peminjaman (misal 3 jam) tanpa mempengaruhi aturan di Sekolah B (misal 24 jam).
-* **Manajemen Multi-Sekolah Mudah**: Dilengkapi script interaktif `add_school.py` untuk mendaftarkan sekolah dan akun admin baru secara instan.
+Pinjam alat lab cukup dengan scan QR — pantau, kembalikan, selesai.
 
-### 📱 2. Fitur Siswa
-* **Scan QR Code Alat**: Peminjaman alat secara otomatis melalui pemindaian QR Code dari kamera HP (Android & iOS).
-* **Live Countdown Timer**: Penghitung waktu mundur peminjaman secara real-time.
-* **Perpanjangan Waktu Peminjaman**: Permohonan perpanjangan durasi pinjam langsung dari dashboard siswa (maksimal 2x perpanjangan).
-* **Profil & Keamanan**: Pengubahan kata sandi siswa dengan invalidasi sesi multi-perangkat (password versioning).
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python&logoColor=white)
+![Flask](https://img.shields.io/badge/Flask-3.0-black?logo=flask&logoColor=white)
+![SQLite](https://img.shields.io/badge/Database-SQLite-003B57?logo=sqlite&logoColor=white)
+![License](https://img.shields.io/badge/Lisensi-MIT-green)
 
-### 🛠️ 3. Fitur Admin (Laboran)
-* **Dashboard Live Monitoring**: Monitoring peminjaman aktif dengan indikator warna status (*Aktif / Kembali / Overdue*).
-* **CRUD Alat Lab & Auto-Generate QR Code**: Pembuatan alat baru dengan QR Code PNG yang digenerate otomatis.
-* **Cetak Label QR Code**: Fitur pencetakan massal atau terpilih untuk stiker label QR alat lab.
-* **Import & Export Excel (`.xlsx`)**: Import massal data siswa dan alat lab via file Excel beserta preview validasi data.
-* **Pengaturan Sistem & Keamanan**: Pengubahan kata sandi admin dengan enkripsi aman, serta pemeliharaan data.
+*Proyek sekolah — dibuat agar siswa dan laboran mengelola alat lab dengan rapi, cepat, dan tercatat.*
 
-### 🌐 4. Integrated Web Database Management (`sqlite-web`)
-* **Web Database GUI 24/7**: Terintegrasi dengan `sqlite-web` service di port `8080` untuk pengelolaan SQLite via browser.
-* **Proteksi Password**: Dilengkapi sistem autentikasi password terenkripsi untuk keamanan akses web database.
+<img src="static/images/gambar_samping.jpeg" alt="Tampilan LabKeeper" width="720">
+
+</div>
 
 ---
 
-## 🛠️ Arsitektur & Teknologi (Tech Stack)
+## 📋 Daftar Isi
 
-| Komponen | Teknologi / Library |
+1. [Apa itu LabKeeper?](#-apa-itu-labkeeper)
+2. [Fitur Utama](#-fitur-utama)
+3. [Cara Menjalankan di Laptop (5 Menit)](#-cara-menjalankan-di-laptop-5-menit)
+4. [Alur Peminjaman Singkat](#-alur-peminjaman-singkat)
+5. [Tech Stack](#-tech-stack)
+6. [Struktur Proyek](#%EF%B8%8F-struktur-proyek)
+7. [Script Pembantu](#-script-pembantu)
+8. [Deployment ke VPS](#-deployment-ke-vps)
+9. [Keamanan](#-keamanan)
+10. [Lisensi](#-lisensi)
+
+---
+
+## 🤔 Apa itu LabKeeper?
+
+Masalah yang biasa terjadi di lab sekolah:
+
+| 😩 Sebelum | ✅ Dengan LabKeeper |
 |---|---|
-| **Core Framework** | Python 3.11 / Flask 3.0 |
-| **Database & ORM** | SQLite 3 / Flask-SQLAlchemy 3.1 |
-| **Authentikasi** | Werkzeug Security (Scrypt & PBKDF2 Password Hashing) |
-| **QR Code Engine** | `qrcode[pil]` (Pillow Image Generator) |
-| **Excel Engine** | `openpyxl` (Import & Styled Export) |
-| **Zona Waktu** | `Asia/Jakarta` (Waktu Indonesia Barat / WIB - UTC+7) |
-| **Frontend Layout** | Jinja2 Templates, HTML5 Semantic, Custom Vanilla CSS (Bento Grid) |
-| **Production Server** | Gunicorn (3 Workers) + Nginx Reverse Proxy + Certbot SSL |
+| Peminjaman dicatat di buku tulis manual | Semua tercatat otomatis saat siswa scan QR |
+| Alat hilang, tidak tahu siapa yang pinjam terakhir | Riwayat peminjaman lengkap per alat |
+| Tidak tahu alat harus kapan dikembalikan | Countdown timer real-time + status *Aktif / Kembali / Terlambat* |
+| Laboran harus absen terus di lab | Monitoring via dashboard dari HP atau laptop |
+
+LabKeeper mendukung **Multi-Sekolah (Multi-Tenant)** — satu aplikasi bisa dipakai banyak sekolah dengan data yang terisolasi 100%, dan setiap sekolah punya aturan durasi peminjaman sendiri.
 
 ---
 
-## 🗂️ Struktur Direktori Proyek
+## ✨ Fitur Utama
+
+<details open>
+<summary><b>📱 Untuk Siswa</b></summary>
+
+* **Scan QR Code Alat** — pinjam alat lewat kamera HP (Android & iOS), tanpa ketik apa pun.
+* **Live Countdown Timer** — sisa waktu peminjaman berjalan real-time.
+* **Perpanjangan Waktu** — ajukan perpanjangan langsung dari dashboard (maks. 2x).
+* **Riwayat Peminjaman** — semua riwayat pinjam tercatat rapi.
+* **Ganti Kata Sandi** — dengan invalidasi sesi di semua perangkat lain.
+
+</details>
+
+<details open>
+<summary><b>🛠️ Untuk Admin / Laboran</b></summary>
+
+* **Dashboard Live Monitoring** — status peminjaman dengan indikator warna (*Aktif / Kembali / Terlambat*).
+* **Kelola Alat + QR Otomatis** — tambah alat, QR Code PNG ter-generate otomatis.
+* **Cetak Label QR** — cetak stiker QR massal atau terpilih.
+* **Import & Export Excel** — import data siswa/alat dari `.xlsx` dengan preview validasi.
+* **Verifikasi Dua Langkah** — peminjaman dan pengembalian dikonfirmasi dua pihak.
+
+</details>
+
+<details>
+<summary><b>🏫 Multi-Sekolah & Lainnya</b></summary>
+
+* **Isolasi data per sekolah** — data alat, siswa, admin, dan riwayat tidak pernah bercampur antar sekolah.
+* **Durasi peminjaman independen** — Sekolah A bisa 3 jam, Sekolah B bisa 24 jam.
+* **Registrasi sekolah baru** — cukup jalankan script `add_school.py`.
+* **Web GUI Database** — layanan `sqlite-web` (seperti phpMyAdmin untuk SQLite) di port 8080.
+
+</details>
+
+---
+
+## 🚀 Cara Menjalankan di Laptop (5 Menit)
+
+Cukup 3 langkah — tanpa database server, tanpa konfigurasi rumit.
+
+**1. Siapkan file & environment:**
+
+```bash
+git clone https://github.com/Hanzyzy/labkeeper-public.git
+cd labkeeper-public
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# Linux/Mac:
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+**2. Atur password akun demo lalu buat database:**
+
+```bash
+# Windows (CMD):
+set LABKEEPER_ADMIN_PASSWORD=admin12345
+set LABKEEPER_STUDENT_PASSWORD=siawa12345
+
+# Linux/Mac:
+export LABKEEPER_ADMIN_PASSWORD=admin12345
+export LABKEEPER_STUDENT_PASSWORD=siawa12345
+
+python reset_db.py
+```
+
+**3. Jalankan:**
+
+```bash
+python app.py
+```
+
+Buka browser: **http://localhost:5000** 🎉
+
+| Akun | Username | Password |
+|---|---|---|
+| Admin | `admin` | `admin12345` *(contoh di atas — sesuaikan)* |
+| Siswa | `1001` – `1005` | `siawa12345` *(contoh di atas — sesuaikan)* |
+
+> Catatan: password minimal 8 karakter, diatur lewat environment variable agar tidak pernah tersimpan di dalam kode.
+
+---
+
+## 🔄 Alur Peminjaman Singkat
 
 ```text
-labkeeper/
-├── app.py                  # Main Flask Application (Routes & Logic)
-├── models.py               # SQLAlchemy ORM Models (School, Admin, Student, Tool, Borrowing, Config)
-├── auth.py                 # Authentication Helpers & Session Decorators
-├── datetime_utils.py       # Timezone WIB (Asia/Jakarta) Helpers & Utilities
-├── qr_utils.py             # QR Code Generator using Pillow
-├── reset_db.py             # Script Reset & Seeding Initial Data
-├── add_school.py           # Script Interaktif Tambah Sekolah & Admin Baru
-├── fix_db.py               # Script Perbaikan Format Tanggal Database
-├── deploy_vps.sh           # Script Deployment VPS Otomatis
-├── requirements.txt        # Python Dependencies
-├── README.md               # Dokumentasi Resmi Proyek
-│
-├── instance/
-│   └── labkeeper.db        # File Database SQLite
-│
-├── static/
-│   ├── css/new_style.css   # Custom CSS Styling & Responsive Design
-│   ├── js/countdown.js     # Live Countdown Timer Vanilla JS
-│   ├── images/             # Asset Gambar Logo & Hero Banner
-│   ├── qr_codes/           # File Gambar PNG QR Code Alat Lab
-│   └── uploads/            # File Avatar Siswa & Foto Alat
-│
-└── templates/
-    ├── base.html           # Public Base Layout Template
-    ├── admin_base.html     # Admin Sidebar Base Template
-    ├── index.html          # Halaman Beranda & Katalog Sekolah
-    ├── scan.html           # Halaman Scanner QR Code
-    ├── tool_detail.html    # Detail Alat Lab
-    ├── login.html          # Login Siswa
-    ├── pinjam.html         # Form Konfirmasi Pinjam
-    ├── history.html        # Riwayat Peminjaman Siswa
-    └── admin/
-        ├── admin_login.html# Login Admin Sekolah
-        ├── dashboard.html  # Live Dashboard Monitoring
-        ├── tools.html      # Kelola Alat Lab
-        ├── tool_form.html  # Form Tambah/Edit Alat
-        ├── students.html   # Kelola Data Siswa
-        ├── borrowings.html # Kelola & Export Peminjaman
-        ├── qr_labels.html  # Cetak Label QR Code
-        └── settings.html  # Pengaturan Sistem & Keamanan
+Scan QR  →  Konfirmasi Pinjam  →  Verifikasi Admin  →  Alat Dipakai (countdown jalan)
+                │
+                └→  Ajukan Kembali  →  Verifikasi Admin  →  Alat Kembali ke Lab
 ```
 
 ---
 
-## 🚀 Panduan Penggunaan Script Pembantu
+## 🛠️ Tech Stack
 
-### 1. Menambah Sekolah & Admin Baru (CLI Interaktif)
-```bash
-cd /var/www/labkeeper
-source venv/bin/activate
-python3 add_school.py
-```
+| Komponen | Teknologi |
+|---|---|
+| Core Framework | Python 3.11 / Flask 3.0 |
+| Database & ORM | SQLite 3 / Flask-SQLAlchemy 3.1 |
+| Autentikasi | Werkzeug Security (Scrypt & PBKDF2) |
+| QR Code | `qrcode[pil]` (Pillow) |
+| Excel | `openpyxl` (import & styled export) |
+| Zona Waktu | `Asia/Jakarta` (WIB, UTC+7) |
+| Frontend | Jinja2, HTML5, Vanilla CSS (Bento Grid), Vanilla JS |
+| Production | Gunicorn (3 workers) + Nginx + Certbot SSL |
 
-### 2. Reset & Seed Data Awal
-```bash
-python3 reset_db.py
-```
+---
 
-### 3. Memperbaiki Format Tanggal SQLite (jika di-input manual)
-```bash
-python3 fix_db.py
+## 🗂️ Struktur Proyek
+
+```text
+labkeeper-public/
+├── app.py                  # Aplikasi Flask utama (routes & logic)
+├── models.py               # Model database (School, Admin, Student, Tool, Borrowing)
+├── auth.py                 # Helper autentikasi & decorator session
+├── datetime_utils.py       # Helper zona waktu WIB
+├── qr_utils.py             # Generator QR Code (Pillow)
+├── reset_db.py             # Reset & seed data awal
+├── add_school.py           # Tambah sekolah & admin baru (interaktif)
+├── fix_db.py               # Perbaikan format tanggal database
+├── deploy_vps.sh           # Deployment VPS otomatis
+├── requirements.txt        # Dependensi Python
+├── static/                 # CSS, JS, gambar, QR code alat
+└── templates/              # Semua halaman (Jinja2)
+    └── admin/              # Halaman khusus admin/laboran
 ```
 
 ---
 
-## 🌐 Layanan Web GUI Database Management (`sqlite-web`)
+## 🔧 Script Pembantu
 
-Untuk mengakses GUI database berbasis browser (mirip phpMyAdmin):
-
-* **URL**: `http://IP_VPS_ANDA:8080`
-* **Password**: gunakan nilai rahasia dari environment `SQLITE_WEB_PASSWORD`.
-
-### Menjalankan Service Nonstop (Systemd):
-```bash
-echo '[Unit]
-Description=SQLite Web GUI Manager for LabKeeper
-After=network.target
-
-[Service]
-User=ubuntu
-WorkingDirectory=/var/www/labkeeper
-EnvironmentFile=/var/www/labkeeper/.env
-ExecStart=/var/www/labkeeper/venv/bin/python3 -m sqlite_web /var/www/labkeeper/instance/labkeeper.db --port 8080 --host 0.0.0.0 --password
-Restart=always
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target' | sudo tee /etc/systemd/system/sqlite-web.service > /dev/null
-
-sudo systemctl daemon-reload
-sudo systemctl restart sqlite-web
-```
+| Script | Fungsi |
+|---|---|
+| `add_school.py` | Daftarkan sekolah baru + akun admin-nya |
+| `reset_db.py` | Hapus & isi ulang database dengan data awal |
+| `fix_db.py` | Perbaiki format tanggal lama di SQLite |
 
 ---
 
-## ⚡ Deployment & Update Cepat di VPS
+## 🌐 Deployment ke VPS
 
-Pastikan `.env` tersedia sebelum service dijalankan. Untuk server lama yang belum memiliki `.env`:
+Sudah disiapkan script otomatis:
 
 ```bash
-cd /var/www/labkeeper
-SECRET_KEY=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-printf 'SECRET_KEY=%s\nBASE_URL=https://DOMAIN_ANDA\nTRUST_PROXY=true\nSESSION_COOKIE_SECURE=true\nLABKEEPER_SEED=false\n' "$SECRET_KEY" > .env
-chmod 600 .env
+bash deploy_vps.sh
 ```
 
-Untuk memperbarui aplikasi ke versi terbaru di server VPS:
+Script ini memasang venv, dependensi, service systemd, Nginx reverse proxy, dan SSL Certbot. Untuk update aplikasi di server:
 
 ```bash
 cd /var/www/labkeeper
 git pull && sudo systemctl restart labkeeper
 ```
 
+Konfigurasi environment disalin dari `.env.example` — **jangan pernah commit file `.env` asli**.
+
+---
+
+## 🔐 Keamanan
+
+* Password di-hash (Scrypt/PBKDF2) — tidak pernah disimpan sebagai teks biasa.
+* `SECRET_KEY` di-generate acak per deployment, tidak hardcoded.
+* Isolasi data antar sekolah di level query.
+* Ganti password mem-invalidasi sesi di perangkat lain (password versioning).
+* Cookie session bisa dipaksa HTTPS (`SESSION_COOKIE_SECURE`).
+
 ---
 
 ## 📜 Lisensi
 
-Dokumen dan kode sumber **LabKeeper** dilindungi di bawah lisensi MIT — bebas digunakan, dikembangkan, dan disebarluaskan untuk kebutuhan pendidikan di Indonesia.
+Dilisensikan di bawah [Lisensi MIT](LICENSE) — bebas dipelajari, dipakai, dan dikembangkan untuk kepentingan pendidikan di Indonesia.
+
+<div align="center">
+
+**Dibuat dengan 🔬 dan ☕ oleh [Hanzyzy](https://github.com/Hanzyzy)**
+
+*Kalau proyek ini membantu, ⭐ star di repo ini sangat diapresiasi!*
+
+</div>
